@@ -1,0 +1,79 @@
+# Trade Finance Network Configuration
+# For details, refer to the book - Enterprise Blockchain - A Definitive handbook
+# The configtxgen tool uses the file for generating certificates for the entire Trade Finance Enterprise Blockchain network
+
+Profiles:
+
+    TradeFinanceOrdererGenesis:
+        Orderer:
+            <<: *OrdererDefaults
+            Organizations:
+                - *OrdererOrg
+        Consortiums:
+            TradeConsortium:
+                Organizations:
+                    - *Org1
+                    - *Org2
+                    - *Org3
+                    
+    TradeFinanceOrgsChannel:
+        Consortium: TradeConsortium
+        Application:
+            <<: *ApplicationDefaults
+            Organizations:
+                - *Org1
+                - *Org2
+                - *Org3
+
+Organizations:
+
+    - &OrdererOrg
+        Name: OrdererOrg
+        ID: OrdererMSP
+        MSPDir: crypto-config/ordererOrganizations/fte.com/msp
+
+    - &Org1
+        Name: Org1FTE
+        ID: Org1FTE
+        MSPDir: crypto-config/peerOrganizations/app.fte.com/msp
+
+        AnchorPeers:
+            - Host: peer0.app.fte.com
+              Port: 7051
+
+    - &Org2
+        Name: Org2BNK
+        ID: Org2BNK
+        MSPDir: crypto-config/peerOrganizations/bnk.com/msp
+        AnchorPeers:
+            - Host: peer0.bnk.com
+              Port: 7051
+
+    - &Org3
+        Name: Org3SHP
+        ID: Org3SHP
+        MSPDir: crypto-config/peerOrganizations/shp.com/msp
+        AnchorPeers:
+            - Host: peer0.shp.com
+              Port: 7051
+
+Orderer: &OrdererDefaults
+
+    OrdererType: solo
+    Addresses:
+        - orderer.fte.com:7050
+    BatchTimeout: 5s
+    BatchSize:
+        MaxMessageCount: 5
+        AbsoluteMaxBytes: 10 MB
+        PreferredMaxBytes: 512 KB
+
+    Kafka:
+       Brokers:
+            - 127.0.0.1:9092
+
+    Organizations:
+
+Application: &ApplicationDefaults
+
+    Organizations:

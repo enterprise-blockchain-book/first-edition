@@ -1,0 +1,102 @@
+# Trade Finance Network Docker Configuration
+# The file extends docker-trade-finance-base.yaml. This file setups network for Trade Finance End to End application
+# For details, refer to the book - Enterprise Blockchain - A Definitive handbook
+
+version: '2'
+
+networks:
+  tradenwk:
+
+services:
+
+  orderer.fte.com:
+    extends:
+      file:   base/docker-trade-finance-base.yaml
+      service: orderer.fte.com
+    container_name: orderer.fte.com
+    networks:
+      - tradenwk
+
+  peer0.app.fte.com:
+    container_name: peer0.app.fte.com
+    extends:
+      file:  base/docker-trade-finance-base.yaml
+      service: peer0.app.fte.com
+    networks:
+      - tradenwk
+
+  peer1.app.fte.com:
+    container_name: peer1.app.fte.com
+    extends:
+      file:  base/docker-trade-finance-base.yaml
+      service: peer1.app.fte.com
+    networks:
+      - tradenwk
+
+  peer0.bnk.com:
+    container_name: peer0.bnk.com
+    extends:
+      file:  base/docker-trade-finance-base.yaml
+      service: peer0.bnk.com
+    networks:
+      - tradenwk
+
+  peer1.bnk.com:
+    container_name: peer1.bnk.com
+    extends:
+      file:  base/docker-trade-finance-base.yaml
+      service: peer1.bnk.com
+    networks:
+      - tradenwk
+
+  peer0.shp.com:
+    container_name: peer0.shp.com
+    extends:
+      file:  base/docker-trade-finance-base.yaml
+      service: peer0.shp.com
+    networks:
+      - tradenwk
+
+  peer1.shp.com:
+    container_name: peer1.shp.com
+    extends:
+      file:  base/docker-trade-finance-base.yaml
+      service: peer1.shp.com
+    networks:
+      - tradenwk
+
+  cli:
+    container_name: cli
+    image: hyperledger/fabric-tools
+    tty: true
+    environment:
+      - GOPATH=/opt/gopath
+      - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+      - CORE_LOGGING_LEVEL=DEBUG
+      - CORE_PEER_ID=cli
+      - CORE_PEER_ADDRESS=peer0.app.fte.com:7051
+      - CORE_PEER_LOCALMSPID=Org1FTE
+      - CORE_PEER_TLS_ENABLED=true
+      - CORE_PEER_TLS_CERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/app.fte.com/peers/peer0.app.fte.com/tls/server.crt
+      - CORE_PEER_TLS_KEY_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/app.fte.com/peers/peer0.app.fte.com/tls/server.key
+      - CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/app.fte.com/peers/peer0.app.fte.com/tls/ca.crt
+      - CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/app.fte.com/users/Admin@app.fte.com/msp
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+    command: /bin/bash -c './scripts/script.sh ${CHANNEL_NAME} ${DELAY}; sleep $TIMEOUT'
+    volumes:
+        - /var/run/:/host/var/run/
+        - ./chaincode/:/opt/gopath/src/github.com/hyperledger/fabric/examples/chaincode/go
+        - ./crypto-config:/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/
+        - ./scripts:/opt/gopath/src/github.com/hyperledger/fabric/peer/scripts/
+        - ./channel-artifacts:/opt/gopath/src/github.com/hyperledger/fabric/peer/channel-artifacts
+    depends_on:
+      - orderer.fte.com
+      - peer0.app.fte.com
+      - peer1.app.fte.com
+      - peer0.bnk.com
+      - peer1.bnk.com
+      - peer0.shp.com
+      - peer1.shp.com
+    networks:
+      - tradenwk
+

@@ -1,0 +1,77 @@
+<!-- Crowd Sourcing DAPP Client. For more details, refer to the book - Enterprise Blockchain - A Definitive Handbook -->
+<html>
+<head>
+    <title>Crowd Sourcing DApp</title>
+   <script type="text/javascript" src="bignumber.js"></script>
+   <script type="text/javascript" src="web3.js"></script>
+
+
+    <script type="text/javascript">
+        //Replace this by your crowd sourcing contract address
+        var contract_address = "0x290298BF15D9546850161e3046233801F2488523";
+        
+        //The crowd sourcing contract, you can leave this as-is if you have not changed the contract
+        var contract_abi = [ { "constant": true, "inputs": [], "name": "fundingproject", "outputs": [ { "name": "name", "type": "string", "value": "j" }, { "name": "email", "type": "string", "value": "j" }, { "name": "website", "type": "string", "value": "j" }, { "name": "minimumfunds", "type": "uint256", "value": "77000000000000000000" }, { "name": "amountraised", "type": "uint256", "value": "0" }, { "name": "owner", "type": "address", "value": "0xd2b0ee159a3d41d30300500ade3c6727c6eebcb9" }, { "name": "status", "type": "string", "value": "Funding Started" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": false, "inputs": [], "name": "stopFundRaising", "outputs": [], "payable": true, "stateMutability": "payable", "type": "function" }, { "constant": false, "inputs": [ { "name": "name", "type": "string" } ], "name": "fundProject", "outputs": [], "payable": true, "stateMutability": "payable", "type": "function" }, { "constant": true, "inputs": [ { "name": "", "type": "uint256" } ], "name": "funders", "outputs": [ { "name": "name", "type": "string" }, { "name": "fundedby", "type": "address" }, { "name": "amount", "type": "uint256" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [], "name": "getProjectStatus", "outputs": [ { "name": "", "type": "string", "value": "Funding Started" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "inputs": [ { "name": "_name", "type": "string", "index": 0, "typeShort": "string", "bits": "", "displayName": "&thinsp;<span class=\"punctuation\">_</span>&thinsp;name", "template": "elements_input_string", "value": "j" }, { "name": "_email", "type": "string", "index": 1, "typeShort": "string", "bits": "", "displayName": "&thinsp;<span class=\"punctuation\">_</span>&thinsp;email", "template": "elements_input_string", "value": "j" }, { "name": "_website", "type": "string", "index": 2, "typeShort": "string", "bits": "", "displayName": "&thinsp;<span class=\"punctuation\">_</span>&thinsp;website", "template": "elements_input_string", "value": "j" }, { "name": "_minimumfunds", "type": "uint256", "index": 3, "typeShort": "uint", "bits": "256", "displayName": "&thinsp;<span class=\"punctuation\">_</span>&thinsp;minimumfunds", "template": "elements_input_uint", "value": "77" }, { "name": "_owner", "type": "address", "index": 4, "typeShort": "address", "bits": "", "displayName": "&thinsp;<span class=\"punctuation\">_</span>&thinsp;owner", "template": "elements_input_address", "value": "" } ], "payable": false, "stateMutability": "nonpayable", "type": "constructor" } ]
+        
+        //Location where Ethereum Node is running, if you have followed the book, leave this as-is
+        web3 = new Web3(new Web3.providers.HttpProvider("http://127.0.0.1:8545"));
+        
+
+        //Create contract instance
+        var contract_instance = web3.eth.contract(contract_abi).at(contract_address);
+        console.log(contract_instance)
+   
+       
+        
+         function updateStatusFromContract() {
+           
+            document.getElementById("status").innerText =   contract_instance.getProjectStatus();
+        }
+        
+        function getStatus() {
+            //Unlock main Ether Base account and replace password by your account password
+            //This is a demo setup only, get this value through secured login credentials in actual environment
+            web3.personal.unlockAccount(web3.eth.accounts[0], 'passw0rd');
+            
+            //Call the Stop Fund Raising method
+            contract_instance.stopFundRaising({from: web3.eth.accounts[0]}, function(error, result) {
+                if(error) {
+                    console.error(error);
+                } else {
+                    var hash = result;
+                    console.log("hash"+hash);
+                    checkHashStatus(hash, updateStatusFromContract);
+                }
+            });
+        }
+
+        function checkHashStatus(hash, callback) {
+            web3.eth.getTransactionReceipt(hash, function(error, rcpt) {
+                if(error) {
+                    console.error(error);
+                } else {
+                    if(rcpt == null) {
+                        setTimeout(function() {
+                            //call iteratively till hash matches and block is mined
+                            checkHashStatus(hash, callback);
+                        }, 1000);
+                    } else {
+                        console.log(rcpt)
+                        //call the function once block is committed
+                        callback();
+                    }
+                }
+            })
+        }
+    </script>
+</head>
+<body>
+<h1>Crowd Sourcing DApp</h1>
+
+<button onclick="getStatus()">Stop Fund Raising</button>
+
+
+ <span id="status"></span>
+
+</body>
+</html>

@@ -1,0 +1,28 @@
+# Trade Finance Network Configuration
+# For details, refer to the book - Enterprise Blockchain - A Definitive handbook
+#
+
+OrdererOrgs:
+  - Name: Orderer
+    Domain: fte.com
+    Specs:
+      - Hostname: orderer
+PeerOrgs:
+  - Name: Org1
+    Domain: app.fte.com
+    Template:
+      Count: 2
+    Users:
+      Count: 2
+  - Name: Org2
+    Domain: bnk.com
+    Template:
+      Count: 2
+    Users:
+      Count: 2
+  - Name: Org3
+    Domain: shp.com
+    Template:
+      Count: 2
+    Users:
+      Count: 1

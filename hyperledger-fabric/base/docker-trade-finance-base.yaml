@@ -1,0 +1,146 @@
+# Trade Finance Docker Based Configuration
+# This file is extended by docker-trade-finance.yaml
+# For details, refer to the book - Blockchain - A Definitive handbook
+#
+
+version: '2'
+
+services:
+
+  orderer.fte.com:
+    container_name: orderer.fte.com
+    image: hyperledger/fabric-orderer
+    environment:
+      - ORDERER_GENERAL_LOGLEVEL=debug
+      - ORDERER_GENERAL_LISTENADDRESS=0.0.0.0
+      - ORDERER_GENERAL_GENESISMETHOD=file
+      - ORDERER_GENERAL_GENESISFILE=/var/hyperledger/orderer/orderer.genesis.block
+      - ORDERER_GENERAL_LOCALMSPID=OrdererMSP
+      - ORDERER_GENERAL_LOCALMSPDIR=/var/hyperledger/orderer/msp
+      - ORDERER_GENERAL_TLS_ENABLED=true
+      - ORDERER_GENERAL_TLS_PRIVATEKEY=/var/hyperledger/orderer/tls/server.key
+      - ORDERER_GENERAL_TLS_CERTIFICATE=/var/hyperledger/orderer/tls/server.crt
+      - ORDERER_GENERAL_TLS_ROOTCAS=[/var/hyperledger/orderer/tls/ca.crt]
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric
+    command: orderer
+    volumes:
+    - ../channel-artifacts/genesis.block:/var/hyperledger/orderer/orderer.genesis.block
+    - ../crypto-config/ordererOrganizations/fte.com/orderers/orderer.fte.com/msp:/var/hyperledger/orderer/msp
+    - ../crypto-config/ordererOrganizations/fte.com/orderers/orderer.fte.com/tls/:/var/hyperledger/orderer/tls
+    ports:
+      - 7050:7050
+
+  peer0.app.fte.com:
+    container_name: peer0.app.fte.com
+    extends:
+      file: peer-trade-finance-base.yaml
+      service: peer-trade-finance-base
+    environment:
+      - CORE_PEER_ID=peer0.app.fte.com
+      - CORE_PEER_ADDRESS=peer0.app.fte.com:7051
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.app.fte.com:7051
+      - CORE_PEER_LOCALMSPID=Org1FTE
+    volumes:
+        - /var/run/:/host/var/run/
+        - ../crypto-config/peerOrganizations/app.fte.com/peers/peer0.app.fte.com/msp:/etc/hyperledger/fabric/msp
+        - ../crypto-config/peerOrganizations/app.fte.com/peers/peer0.app.fte.com/tls:/etc/hyperledger/fabric/tls
+    ports:
+      - 7051:7051
+      - 7053:7053
+
+  peer1.app.fte.com:
+    container_name: peer1.app.fte.com
+    extends:
+      file: peer-trade-finance-base.yaml
+      service: peer-trade-finance-base
+    environment:
+      - CORE_PEER_ID=peer1.app.fte.com
+      - CORE_PEER_ADDRESS=peer1.app.fte.com:7051
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer1.app.fte.com:7051
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.app.fte.com:7051
+      - CORE_PEER_LOCALMSPID=Org1FTE
+    volumes:
+        - /var/run/:/host/var/run/
+        - ../crypto-config/peerOrganizations/app.fte.com/peers/peer1.app.fte.com/msp:/etc/hyperledger/fabric/msp
+        - ../crypto-config/peerOrganizations/app.fte.com/peers/peer1.app.fte.com/tls:/etc/hyperledger/fabric/tls
+
+    ports:
+      - 8051:7051
+      - 8053:7053
+
+  peer0.bnk.com:
+    container_name: peer0.bnk.com
+    extends:
+      file: peer-trade-finance-base.yaml
+      service: peer-trade-finance-base
+    environment:
+      - CORE_PEER_ID=peer0.bnk.com
+      - CORE_PEER_ADDRESS=peer0.bnk.com:7051
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.bnk.com:7051
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.bnk.com:7051
+      - CORE_PEER_LOCALMSPID=Org2BNK
+    volumes:
+        - /var/run/:/host/var/run/
+        - ../crypto-config/peerOrganizations/bnk.com/peers/peer0.bnk.com/msp:/etc/hyperledger/fabric/msp
+        - ../crypto-config/peerOrganizations/bnk.com/peers/peer0.bnk.com/tls:/etc/hyperledger/fabric/tls
+    ports:
+      - 9051:7051
+      - 9053:7053
+
+  peer1.bnk.com:
+    container_name: peer1.bnk.com
+    extends:
+      file: peer-trade-finance-base.yaml
+      service: peer-trade-finance-base
+    environment:
+      - CORE_PEER_ID=peer1.bnk.com
+      - CORE_PEER_ADDRESS=peer1.bnk.com:7051
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer1.bnk.com:7051
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer1.bnk.com:7051
+      - CORE_PEER_LOCALMSPID=Org2BNK
+    volumes:
+        - /var/run/:/host/var/run/
+        - ../crypto-config/peerOrganizations/bnk.com/peers/peer1.bnk.com/msp:/etc/hyperledger/fabric/msp
+        - ../crypto-config/peerOrganizations/bnk.com/peers/peer1.bnk.com/tls:/etc/hyperledger/fabric/tls
+    ports:
+      - 10051:7051
+      - 10053:7053
+
+
+  peer0.shp.com:
+    container_name: peer0.shp.com
+    extends:
+      file: peer-trade-finance-base.yaml
+      service: peer-trade-finance-base
+    environment:
+      - CORE_PEER_ID=peer0.shp.com
+      - CORE_PEER_ADDRESS=peer0.shp.com:7051
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.shp.com:7051
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.shp.com:7051
+      - CORE_PEER_LOCALMSPID=Org3SHP
+    volumes:
+        - /var/run/:/host/var/run/
+        - ../crypto-config/peerOrganizations/shp.com/peers/peer0.shp.com/msp:/etc/hyperledger/fabric/msp
+        - ../crypto-config/peerOrganizations/shp.com/peers/peer0.shp.com/tls:/etc/hyperledger/fabric/tls
+    ports:
+      - 11051:7051
+      - 11053:7053
+
+  peer1.shp.com:
+    container_name: peer1.shp.com
+    extends:
+      file: peer-trade-finance-base.yaml
+      service: peer-trade-finance-base
+    environment:
+      - CORE_PEER_ID=peer1.shp.com
+      - CORE_PEER_ADDRESS=peer1.shp.com:7051
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer1.shp.com:7051
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer1.shp.com:7051
+      - CORE_PEER_LOCALMSPID=Org3SHP
+    volumes:
+        - /var/run/:/host/var/run/
+        - ../crypto-config/peerOrganizations/shp.com/peers/peer1.shp.com/msp:/etc/hyperledger/fabric/msp
+        - ../crypto-config/peerOrganizations/shp.com/peers/peer1.shp.com/tls:/etc/hyperledger/fabric/tls
+    ports:
+      - 12051:7051
+      - 12053:7053
