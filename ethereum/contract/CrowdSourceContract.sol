@@ -60,7 +60,7 @@ contract CrowdFunding {
         address _owner
       
         
-        ) internal
+        ) public
     {
         
        	
