@@ -35,7 +35,7 @@ contract CrowdFunding {
     
 	
 	//String comparison utility
-    function stringsEqual(string _a, string _b) internal returns (bool) {
+    function stringsEqual(string _a, string _b) internal pure returns (bool) {
 		
 		//temp allocation
 		bytes memory a = bytes(_a);
@@ -51,7 +51,7 @@ contract CrowdFunding {
 
    
 
-    function CrowdFunding (
+    function CrowdFunding  (
         
         string _name,
         string _email,
@@ -60,7 +60,7 @@ contract CrowdFunding {
         address _owner
       
         
-        )
+        ) public
     {
         
        	
