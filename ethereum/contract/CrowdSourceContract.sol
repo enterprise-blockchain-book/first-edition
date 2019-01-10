@@ -50,8 +50,10 @@ contract CrowdFunding {
 	}
 
    
-
-    function CrowdFunding  (
+ 
+    // function CrowdFunding  ( -- Defining constructors as functions with the same name as the contract is deprecated from solidity release 0.4.23
+    // use function prior to 0.4.23, else use the constructor definition
+    constructor (
         
         string _name,
         string _email,
